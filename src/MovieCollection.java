@@ -38,7 +38,7 @@ public class MovieCollection {
             if (menuOption.equals("t")) {
                 searchTitles();
             } else if (menuOption.equals("c")) {
-                searchCast();
+
             } else if (menuOption.equals("q")) {
                 System.out.println("Goodbye!");
             } else {
@@ -52,10 +52,11 @@ public class MovieCollection {
         try {
             File file = new File("src/movies_data.csv");
             Scanner fileScanner = new Scanner(file);
+            fileScanner.nextLine();
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] parts = line.split(",");
-                if (parts.length == 5) {
+                if (parts.length == 6) {
                     String title = parts[0].trim();
                     String cast = parts[1].trim();
                     String director = parts[2].trim();
@@ -72,20 +73,18 @@ public class MovieCollection {
     }
 
     private void searchTitles() {
-        ArrayList<String> matches = new ArrayList<String>();
+        ArrayList<Movie> matches = new ArrayList<Movie>();
         System.out.println("Enter a title search term: ");
         String term = scan.nextLine();
 
         int counter = 0;
-        int leftIdx = 0;
-        int rightIdx = movieList.size() - 1;
-        String temp = "";
+        Movie temp;
         int m = 0;
 
-        for (int i = 0; i < movieList.size() - 1; i++) {
-            if (movieList.get(i).getTitle().contains(term)) {
+        for (int i = 0; i < movieList.size(); i++) {
+            if (movieList.get(i).getTitle().toLowerCase().contains(term)) {
                 counter++;
-                matches.add(movieList.get(i).getTitle());
+                matches.add(movieList.get(i));
             }
         }
 
@@ -97,7 +96,7 @@ public class MovieCollection {
 
         for (int i = 1; i < matches.size(); i++) {
             m = i;
-            while(m != 0 && matches.get(m).compareTo(matches.get(m - 1)) < 0) {
+            while(m != 0 && matches.get(m).getTitle().compareTo(matches.get(m - 1).getTitle()) < 0) {
                 temp = matches.get(m);
                 matches.set(m , matches.get(m - 1));
                 matches.set(m - 1, temp);
@@ -105,88 +104,20 @@ public class MovieCollection {
             }
         }
 
-        for (String match : matches) {
+        for (Movie match : matches) {
             counter++;
-            System.out.println(counter + ". " + match);
+            System.out.println(counter + ". " + match.getTitle());
         }
-
+        System.out.println("Which movie would you like to learn more about?");
+        System.out.println("Enter Number: ");
+        int num = scan.nextInt();
+        System.out.println("Title: " + matches.get(num - 1).getTitle());
+        System.out.println("Runtime: " + matches.get(num - 1).getRuntime());
+        System.out.println("Directed By: " + matches.get(num - 1).getDirector());
+        System.out.println("Cast: " + matches.get(num - 1).getCast());
+        System.out.println("Overview: " + matches.get(num - 1).getOverview());
+        System.out.println("User Rating: " + matches.get(num - 1).getUserRating());
     }
 
-
-    private void saveData() {
-        try (PrintWriter writer = new PrintWriter("src/movies_data.csv")) {
-            for (Movie movie : movieList) {
-                writer.println(item.getName() + "," + item.getPrice());
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving shopping list.");
-        }
-    }
-
-
-    private void viewShoppingList() {
-        if (shoppingList.isEmpty()) {
-            System.out.println("shopping list empty.");
-            return;
-        }
-        for (Item item : shoppingList) {
-            System.out.println(item.getName() + " " + item.getPrice());
-        }
-    }
-
-
-    private void addItemToList() {
-        System.out.print("Enter item name: ");
-        String name = scan.nextLine().trim();
-        System.out.print("Enter item price: ");
-        double price;
-        try {
-            price = Double.parseDouble(scan.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid price. Item not added.");
-            return;
-        }
-        shoppingList.add(new Item(name, price));
-        System.out.println(name + " added to the shopping list.");
-    }
-
-
-    private void editItemPrice() {
-        System.out.print("Enter item name to edit: ");
-        String name = scan.nextLine().trim();
-
-
-        for (Item item : shoppingList) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                System.out.print("Enter new price: ");
-                try {
-                    double newPrice = Double.parseDouble(scan.nextLine().trim());
-                    item.setPrice(newPrice);
-                    System.out.println("Price updated for " + name);
-                    return;
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid price. No changes made.");
-                    return;
-                }
-            }
-        }
-        System.out.println("Item not found.");
-    }
-
-
-    private void removeItem() {
-        System.out.print("Enter item name to remove: ");
-        String name = scan.nextLine().trim();
-
-
-        for (int i = 0; i < shoppingList.size(); i++) {
-            if (shoppingList.get(i).getName().equalsIgnoreCase(name)) {
-                System.out.println(name + " removed.");
-                shoppingList.remove(i);
-                return;
-            }
-        }
-        System.out.println("Item not found.");
-    }
 }
 
